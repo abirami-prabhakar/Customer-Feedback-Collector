@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Feedback System</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f4f4f4;
+}
+.container{
+    width:400px;
+    margin:auto;
+    margin-top:50px;
+    padding:20px;
+    background:white;
+    border-radius:8px;
+    box-shadow:0px 0px 10px rgba(0,0,0,0.1);
+}
+input, select, textarea{
+    width:100%;
+    padding:8px;
+    margin:6px 0;
+}
+button{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    background:#4CAF50;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+button:hover{
+    background:#45a049;
+}
+.question-box{
+    border:1px solid #ddd;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>User Login</h2>
+<div id="loginSection">
+<label>Name</label>
+<input type="text" id="name" required>
+
+<label>Email</label>
+<input type="email" id="email" required>
+
+<label>Age</label>
+<input type="number" id="age">
+
+<label>Gender</label>
+<select id="gender">
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+
+<label>City</label>
+<input type="text" id="city">
+
+<button onclick="loginUser()">Submit</button>
+</div>
+
+<!-- Form Selection and Questions Section -->
+<div id="formSection" style="display:none;">
+<h3>Select Feedback Form</h3>
+<select id="formSelect" onchange="loadQuestions()">
+<option value="">--Select Form--</option>
+</select>
+
+<h3 id="formTitle"></h3>
+<div id="questionsContainer"></div>
+
+<button onclick="submitFeedback()">Submit Feedback</button>
+</div>
+
+</div>
+
+<script>
+let userId = null;
+let questions = [];
+
+// 1️⃣ Login / Register User
+async function loginUser(){
+    const user = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        age: document.getElementById("age").value,
+        gender: document.getElementById("gender").value,
+        city: document.getElementById("city").value
+    }
+
+    const res = await fetch("http://localhost:5000/users",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(user)
+    })
+
+    const data = await res.json()
+    alert(data.message)
+    userId = data.user_id
+
+    // hide login, show form selection
+    document.getElementById("loginSection").style.display="none";
+    document.getElementById("formSection").style.display="block";
+
+    loadForms();
+}
+
+// 2️⃣ Load Forms into Dropdown
+async function loadForms(){
+    const res = await fetch("http://localhost:5000/forms")
+    const forms = await res.json()
+    const dropdown = document.getElementById("formSelect")
+    forms.forEach(f=>{
+        const option = document.createElement("option")
+        option.value = f.form_id
+        option.text = f.title
+        dropdown.add(option)
+    })
+}
+
+// 3️⃣ Load Questions of Selected Form
+async function loadQuestions(){
+    const formId = document.getElementById("formSelect").value
+    if(!formId) return;
+
+    const res = await fetch(`http://localhost:5000/questions/${formId}`)
+    const data = await res.json()
+    questions = data.questions
+
+    document.getElementById("formTitle").innerText = data.form_title
+    const container = document.getElementById("questionsContainer")
+    container.innerHTML = ""
+
+    questions.forEach((q,index)=>{
+        container.innerHTML += `
+        <div class="question-box">
+            <p>${q.question_text}</p>
+            <input type="text" id="answer${index}" placeholder="Your answer">
+            <br><br>
+            Rating:
+            <select id="rating${index}">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        `
+    })
+}
+
+// 4️⃣ Submit Feedback
+async function submitFeedback(){
+    const formId = document.getElementById("formSelect").value
+    if(!formId) return alert("Select a form")
+
+    let responses = []
+    questions.forEach((q,index)=>{
+        responses.push({
+            question_id: q.question_id,
+            answer: document.getElementById(`answer${index}`).value,
+            rating: document.getElementById(`rating${index}`).value
+        })
+    })
+
+    const res = await fetch("http://localhost:5000/submit-feedback",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            user_id:userId,
+            form_id:formId,
+            responses:responses
+        })
+    })
+
+    const data = await res.json()
+    alert("Feedback Submitted!")
+}
+</script>
+
+</body>
+</html>

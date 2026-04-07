@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #f0ecf8;
+    --surface:   #faf8ff;
+    --surface2:  #f3effe;
+    --lilac:     #c9b8f0;
+    --lilac-mid: #a98de0;
+    --accent:    #9b72d8;
+    --text:      #3b2f5e;
+    --text-muted:#8b7ab8;
+    --border:    rgba(169,141,224,0.25);
+    --shadow:    0 4px 32px rgba(155,114,216,0.10);
+    --radius:    18px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    background-image:
+      radial-gradient(ellipse 700px 500px at 20% 10%, rgba(201,184,240,0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 400px at 85% 90%, rgba(219,198,255,0.28) 0%, transparent 65%);
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 460px;
+    padding: 44px 40px 40px;
+    animation: rise 0.55s cubic-bezier(.22,.68,0,1.2) both;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .brand-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--lilac), var(--accent));
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+    margin-top: 16px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b7ab8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--lilac-mid);
+    box-shadow: 0 0 0 3px rgba(169,141,224,0.18);
+    background: #fff;
+  }
+
+  input::placeholder { color: #c0b3d8; }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    margin-top: 26px;
+    background: linear-gradient(135deg, var(--lilac-mid), var(--accent));
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    border: none;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .btn:hover  { opacity: 0.9; transform: translateY(-1px); }
+  .btn:active { transform: scale(0.98); }
+
+  /* === Form section === */
+  #formSection { display: none; animation: rise 0.45s ease both; }
+
+  .form-picker {
+    position: relative;
+    margin-bottom: 26px;
+  }
+
+  .form-picker select {
+    background-color: #fff;
+    border-color: var(--lilac);
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .form-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    margin-bottom: 18px;
+    font-style: italic;
+  }
+
+  .question-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    margin-bottom: 14px;
+    transition: box-shadow 0.2s;
+  }
+
+  .question-box:hover { box-shadow: 0 2px 16px rgba(155,114,216,0.09); }
+
+  .q-text {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .q-input { margin-bottom: 12px; background: #fff; }
+
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rating-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .stars {
+    display: flex;
+    gap: 4px;
+  }
+
+  .star {
+    font-size: 20px;
+    cursor: pointer;
+    color: #ddd0f5;
+    transition: color 0.15s, transform 0.1s;
+    user-select: none;
+    line-height: 1;
+  }
+
+  .star.on  { color: #a98de0; }
+  .star:hover { transform: scale(1.15); }
+
+  .hidden-rating { display: none; }
+
+  /* Step indicator */
+  .steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+
+  .step {
+    height: 4px;
+    border-radius: 99px;
+    flex: 1;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .step.active { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Feedback</span>
+  </div>
+
+  <!-- Login -->
+  <div id="loginSection">
+    <div class="steps">
+      <div class="step active"></div>
+      <div class="step"></div>
+    </div>
+
+    <h2>Tell us a little<br><em style="font-style:italic;color:var(--text-muted);">about yourself</em></h2>
+    <p class="subtitle">We'll personalise your feedback experience.</p>
+
+    <label>Full name</label>
+    <input type="text" id="name" placeholder="e.g. Priya Sharma">
+
+    <label>Email address</label>
+    <input type="email" id="email" placeholder="you@example.com">
+
+    <div class="row-2">
+      <div>
+        <label>Age</label>
+        <input type="number" id="age" placeholder="—">
+      </div>
+      <div>
+        <label>Gender</label>
+        <select id="gender">
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <label>City</label>
+    <input type="text" id="city" placeholder="Where are you based?">
+
+    <button class="btn" onclick="loginUser()">Continue →</button>
+  </div>
+
+  <!-- Feedback Form -->
+  <div id="formSection">
+    <div class="steps">
+      <div class="step active"></div>
+      <div class="step active"></div>
+    </div>
+
+    <h2>Share your<br><em style="font-style:italic;color:var(--text-muted);">feedback</em></h2>
+    <p class="subtitle">Pick a form below and answer a few quick questions.</p>
+
+    <div class="form-picker">
+      <label>Feedback form</label>
+      <select id="formSelect" onchange="loadQuestions()">
+        <option value="">— Choose a form —</option>
+      </select>
+    </div>
+
+    <div id="formTitle" class="form-title"></div>
+    <div id="questionsContainer"></div>
+
+    <button class="btn" onclick="submitFeedback()">Submit feedback ✦</button>
+  </div>
+</div>
+
+<script>
+let userId = null;
+let questions = [];
+
+function initStars(container, index) {
+  const stars = container.querySelectorAll('.star');
+  stars.forEach((s, i) => {
+    s.addEventListener('mouseenter', () => highlight(stars, i));
+    s.addEventListener('mouseleave', () => {
+      const cur = +container.querySelector('.hidden-rating').value;
+      highlight(stars, cur - 1);
+    });
+    s.addEventListener('click', () => {
+      container.querySelector('.hidden-rating').value = i + 1;
+      highlight(stars, i);
+    });
+  });
+}
+
+function highlight(stars, upTo) {
+  stars.forEach((s, i) => s.classList.toggle('on', i <= upTo));
+}
+
+async function loginUser() {
+  const user = {
+    name:   document.getElementById('name').value,
+    email:  document.getElementById('email').value,
+    age:    document.getElementById('age').value,
+    gender: document.getElementById('gender').value,
+    city:   document.getElementById('city').value
+  };
+  const res  = await fetch('http://localhost:5000/users', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(user) });
+  const data = await res.json();
+  alert(data.message);
+  userId = data.user_id;
+
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('formSection').style.display  = 'block';
+  loadForms();
+}
+
+async function loadForms() {
+  const res   = await fetch('http://localhost:5000/forms');
+  const forms = await res.json();
+  const dd    = document.getElementById('formSelect');
+  forms.forEach(f => {
+    const o = document.createElement('option');
+    o.value = f.form_id; o.text = f.title;
+    dd.add(o);
+  });
+}
+
+async function loadQuestions() {
+  const formId = document.getElementById('formSelect').value;
+  if (!formId) return;
+
+  const res  = await fetch(`http://localhost:5000/questions/${formId}`);
+  const data = await res.json();
+  questions  = data.questions;
+
+  document.getElementById('formTitle').textContent = data.title;
+
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+
+  questions.forEach((q, i) => {
+    const box = document.createElement('div');
+    box.className = 'question-box';
+    box.innerHTML = `
+      <p class="q-text">${q.question_text}</p>
+      <input type="text" class="q-input" id="answer${i}" placeholder="Your answer…">
+      <div class="rating-row">
+        <span class="rating-label">Rating</span>
+        <div class="stars" id="stars${i}">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <input type="hidden" class="hidden-rating" id="rating${i}" value="0">
+      </div>`;
+    container.appendChild(box);
+    initStars(box, i);
+  });
+}
+
+async function submitFeedback() {
+  const formId = document.getElementById('formSelect').value;
+  if (!formId) return alert('Please select a form first.');
+
+  const responses = questions.map((q, i) => ({
+    question_id: q.question_id,
+    answer: document.getElementById(`answer${i}`).value,
+    rating: document.getElementById(`rating${i}`).value
+  }));
+
+  await fetch('http://localhost:5000/submit-feedback', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ user_id:userId, form_id:formId, responses })
+  });
+
+  const card = document.querySelector('.card');
+  card.innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:48px;margin-bottom:18px;">✦</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);margin-bottom:10px;">Thank you!</h2>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">Your feedback has been recorded.<br>We appreciate your time.</p>
+    </div>`;
+}
+</script>
+</body>
+</html>
